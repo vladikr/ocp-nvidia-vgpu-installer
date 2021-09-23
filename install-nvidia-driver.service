@@ -1,0 +1,13 @@
+[Unit]
+Description=Service that is running nvidia grid driver installation from startup.
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/root/nvidia/entrypoint.sh
+WorkingDirectory=/root/nvidia
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=%n
