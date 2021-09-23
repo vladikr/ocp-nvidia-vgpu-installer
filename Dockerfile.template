@@ -1,0 +1,47 @@
+FROM DRIVER_TOOLKIT_IMAGE
+
+RUN yum -y install git make sudo gcc mdevctl \
+&& yum clean all \
+&& rm -rf /var/cache/dnf
+
+# Grab the software from upstream and place in the current working director
+# before running the contianer build commands
+WORKDIR /root/nvidia
+ADD NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm.run .
+RUN chmod +x /root/nvidia/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm.run
+# ADD Makefile .
+
+# Extract the NVIDIA drivers, and run the make command to build the kernel modules
+# Move the required files into their proper locations
+# Enable the required services
+RUN /root/nvidia/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm.run -x 
+WORKDIR /root/nvidia/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm/kernel
+RUN make KERNEL_SOURCES=/usr/src/kernels/4.18.0-305.7.1.el8_4.x86_64 && \
+    make modules_install KERNEL_SOURCES=/usr/src/kernels/4.18.0-305.7.1.el8_4.x86_64 && \
+    cp /root/nvidia/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm/nvidia-smi /usr/bin && \
+    cp /root/nvidia/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm/nvidia-vgpu-mgr /usr/bin && \
+    cp /root/nvidia/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm/nvidia-vgpud /usr/bin && \
+    cp /root/nvidia/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm/init-scripts/systemd/* /etc/systemd/system && \
+    mkdir /etc/nvidia
+ADD nvidia-kmod/gridd.conf /etc/nvidia
+RUN systemctl enable nvidia-vgpud
+RUN systemctl enable nvidia-vgpu-mgr
+RUN mkdir -p /usr/share/nvidia/vgpu
+# This is a hack to get the driver built to work with the current release of RHCOS
+RUN ln -s /lib/modules/4.18.0-305.7.1.el8_4.x86_64 /lib/modules/4.18.0-305.10.2.el8_4.x86_64
+RUN cp /root/nvidia/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm/libnvidia-ml.so.460.32.04 /usr/lib/libnvidia-m1.so && \
+    cp /root/nvidia/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm/libnvidia-vgpu.so.460.32.04 /usr/lib/libnvidia-vgpu.so && \
+    cp /root/nvidia/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm/libnvidia-vgxcfg.so.460.32.04 /usr/lib/libnvidia-vgxcfg.so && ldconfig && \
+    cp /root/nvidia/NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm/vgpuConfig.xml /usr/share/nvidia/vgpu
+
+# Add the helper tools
+WORKDIR /root/nvidia-kmod
+ADD nvidia-kmod/Makefile .
+ADD nvidia-kmod/simple-kmod-lib.sh .
+ADD nvidia-kmod/simple-kmod-wrapper.sh .
+ADD nvidia-kmod/simple-kmod.conf .
+RUN mkdir -p /usr/lib/kvc/ \
+    && mkdir -p /etc/kvc/ \
+    && make install
+
+RUN systemctl enable kmods-via-containers@simple-kmod
