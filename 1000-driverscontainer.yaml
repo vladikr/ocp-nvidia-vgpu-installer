@@ -46,16 +46,37 @@ spec:
     spec:
       serviceAccount: simple-kmod-driver-container
       serviceAccountName: simple-kmod-driver-container
+      hostPID: true
+      hostIPC: true
       containers:
       - image: quay.io/vladikr/nvidia_vgpu_test_install:latest
         name: simple-kmod-driver-container
         imagePullPolicy: Always
-        command: ["/sbin/init"]
+        command: ["/root/nvidia/entrypoint.sh"]
         lifecycle:
           preStop:
             exec:
               command: ["/bin/sh", "-c", "systemctl stop kmods-via-containers@simple-kmod"]
         securityContext:
           privileged: true
+
+          allowedCapabilities:
+          - '*'
+          capabilities:
+            add: ["SYS_ADMIN"]
+        volumeMounts:
+        - mountPath: /dev/vfio/
+          name: vfio
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+      volumes:
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
+      - hostPath:
+          path: /dev/vfio/
+          type: Directory
+        name: vfio
       nodeSelector:
         hasGpu: "true"

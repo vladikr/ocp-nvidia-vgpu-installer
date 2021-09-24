@@ -11,8 +11,4 @@ RUN chmod +x /root/nvidia/NVIDIA-Linux-x86_64-470.63-vgpu-kvm.run
 ADD entrypoint.sh .
 RUN chmod +x /root/nvidia/entrypoint.sh
 
-COPY ./install-nvidia-driver.service /etc/systemd/system/
-RUN systemctl enable install-nvidia-driver
-
-# Create a tmp directory for the installer
 RUN mkdir -p /root/tmp
