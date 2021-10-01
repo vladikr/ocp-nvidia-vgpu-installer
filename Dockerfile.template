@@ -4,7 +4,7 @@ RUN yum -y install git make sudo gcc mdevctl \
 && yum clean all \
 && rm -rf /var/cache/dnf
 
-# Grab the software from upstream and place in the current working director
+# Grab the software from NVIDIA Portal and place in the current working director
 # before running the contianer build commands
 WORKDIR /root/nvidia
 ADD NVIDIA-Linux-x86_64-460.32.04-vgpu-kvm.run .
