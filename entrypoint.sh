@@ -5,5 +5,4 @@
 /usr/bin/nvidia-vgpud &
 /usr/bin/nvidia-vgpu-mgr &
 
-while true; do sleep 15 ; /usr/bin/pgrep nvidia-vgpu-mgr $? -eq 0 || echo "nvidia-vgpu-mgr is not running" && exit 1; done
-
+while true; do sleep 15 ; /usr/bin/pgrep nvidia-vgpu-mgr ; if [ $? -ne 0 ] ; then echo "nvidia-vgpu-mgr is not running" && exit 1; fi; done
