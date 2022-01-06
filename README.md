@@ -16,12 +16,11 @@ quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:e0f9b9154538af082596f60af9
 
 ### Configure
  - Update the `FROM` in the [Dockerfile](Dockerfile) with the relevant driver toolkit image.
- - Update the relevant `ADD` in the [Dockerfile](Dockerfile) with the relevant NVIDIA installer binary (E.g. `NVIDIA-Linux-x86_64-470.63-vgpu-kvm.run`)
 
 ### Building the container image:
 
 ```
-podman build -t ocp-nvidia-vgpu-nstaller .
+podman build --build-arg NVIDIA_INSTALLER_BINARY=NVIDIA-Linux-x86_64-470.63-vgpu-kvm.run -t ocp-nvidia-vgpu-nstaller .
 podman push [registry_url]/ocp-nvidia-vgpu-nstaller
 ```
 
