@@ -1,10 +1,6 @@
-FROM quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0f046d61ecc9855e0b7d1846d645661b32654a358c1530dd20efb31f65686f8d
+FROM quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4a197c0dfdf5ca30ff48d6eee25960001dbaa82c86b6dd920c6acc47f5680701
 ARG NVIDIA_INSTALLER_BINARY
 ENV NVIDIA_INSTALLER_BINARY=${NVIDIA_INSTALLER_BINARY:-NVIDIA-Linux-x86_64-470.63-vgpu-kvm.run}
-
-RUN dnf -y install git make sudo gcc \
-&& dnf clean all \
-&& rm -rf /var/cache/dnf
 
 RUN mkdir -p /root/nvidia
 WORKDIR /root/nvidia
