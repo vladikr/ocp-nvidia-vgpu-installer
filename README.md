@@ -11,7 +11,7 @@ This container image installs the NVIDIA's generic Linux GRID driver on Red Hat 
 ### Obtaining the driver toolkit base image
 ```
 $ oc adm release info --image-for=driver-toolkit
-quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:e0f9b9154538af082596f60af99290b5a751e61fd61100912defb71b6cac15c6
+quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4a197c0dfdf5ca30ff48d6eee25960001dbaa82c86b6dd920c6acc47f5680701
 ```
 
 ### Configure
